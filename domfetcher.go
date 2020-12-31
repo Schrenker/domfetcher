@@ -4,27 +4,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"strings"
 
+	"github.com/schrenker/domfetcher/internal/fetchHTTPServer"
 	"golang.org/x/crypto/ssh"
 )
 
-func checkHTTPServer(host string) ([]string, error) {
-	url := strings.Split(host, ":")[0]
-
-	res, err := http.Head("http://" + url)
-	if err != nil {
-		return nil, err
-	}
-
-	return res.Header["Server"], nil
-}
-
 func getVhosts(host string, config *ssh.ClientConfig) {
-	HTTPServer, err := checkHTTPServer(host)
+	HTTPServer, err := fetchHTTPServer.FetchHTTPServer(host)
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 	fmt.Println(HTTPServer)
@@ -80,9 +68,11 @@ func parseSSHAuth(user, keyPath string) *ssh.ClientConfig {
 func fetchFromFile(user, keyPath, inputPath string) {
 	hosts := loadInputFile(inputPath)
 	config := parseSSHAuth(user, keyPath)
-	getVhosts(hosts[0], config)
+	for i := range hosts {
+		getVhosts(hosts[i], config)
+	}
 }
 
 func main() {
-	fetchFromFile("centos", "private/id_rsa", "private/input.txt")
+	fetchFromFile("kylos", "private/kbkey", "private/input.txt")
 }
