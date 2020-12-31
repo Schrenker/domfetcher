@@ -16,33 +16,7 @@ func getVhosts(host string, config *ssh.ClientConfig) {
 		return
 	}
 	fmt.Println(HTTPServer)
-
-	// client, err := ssh.Dial("tcp", hosts[0], config)
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
-	// defer client.Close()
-
-	// ss, err := client.NewSession()
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
-	// defer ss.Close()
-
-	// var stdoutBuf bytes.Buffer
-	// ss.Stdout = &stdoutBuf
-	// ss.Run("uname -a")
-	// fmt.Println(stdoutBuf.String())
-
-}
-
-// remember to add comments option
-func loadInputFile(inputPath string) []string {
-	file, err := ioutil.ReadFile(inputPath)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return strings.Split(string(file), "\n")
+	//add vhost fetching here
 }
 
 func parseSSHAuth(user, keyPath string) *ssh.ClientConfig {
@@ -63,6 +37,21 @@ func parseSSHAuth(user, keyPath string) *ssh.ClientConfig {
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
+}
+
+func loadInputFile(inputPath string) []string {
+	file, err := ioutil.ReadFile(inputPath)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	list := strings.Split(string(file), "\n")
+	result := make([]string, 0)
+	for i := range list {
+		if list[i][0] != '#' {
+			result = append(result, list[i])
+		}
+	}
+	return result
 }
 
 func fetchFromFile(user, keyPath, inputPath string) {
