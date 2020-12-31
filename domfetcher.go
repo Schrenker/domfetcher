@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/schrenker/domfetcher/internal/fetchHTTPServer"
+	"github.com/schrenker/domfetcher/internal/fetchVhosts"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -15,7 +16,7 @@ func getVhosts(host string, config *ssh.ClientConfig) {
 	if err != nil {
 		return
 	}
-	fmt.Println(HTTPServer)
+	fmt.Println(fetchVhosts.FetchVhosts(host, HTTPServer, config))
 	//add vhost fetching here
 }
 
