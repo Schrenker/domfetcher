@@ -6,17 +6,20 @@ import (
 	"log"
 	"strings"
 
-	"github.com/schrenker/domfetcher/internal/fetchHTTPServer"
-	"github.com/schrenker/domfetcher/internal/fetchVhosts"
+	"github.com/schrenker/domfetcher/internal/fetchhttpserver"
+	"github.com/schrenker/domfetcher/internal/fetchvhosts"
 	"golang.org/x/crypto/ssh"
 )
 
 func getVhosts(host string, config *ssh.ClientConfig) {
-	HTTPServer, err := fetchHTTPServer.FetchHTTPServer(host)
+	HTTPServer, err := fetchhttpserver.FetchHTTPServer(host)
 	if err != nil {
 		return
 	}
-	fmt.Println(fetchVhosts.FetchVhosts(host, HTTPServer, config))
+	vhosts := fetchvhosts.FetchVhosts(host, HTTPServer, config)
+	for i := range vhosts {
+		fmt.Println(vhosts[i])
+	}
 	//add vhost fetching here
 }
 

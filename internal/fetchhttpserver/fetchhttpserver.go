@@ -1,4 +1,4 @@
-package fetchHTTPServer
+package fetchhttpserver
 
 import (
 	"net/http"
