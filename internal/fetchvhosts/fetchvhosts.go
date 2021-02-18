@@ -40,7 +40,9 @@ func getNginxVhosts(session *ssh.Session) []string {
 	session.Run("sudo -n nginx -T | grep server_name")
 
 	strippedStr := string(bytes.ReplaceAll(stdoutBuf.Bytes(), []byte("server_name"), []byte("")))
-	separatedStr := strings.Split(strippedStr, "\n")
+	separatedStr := strings.FieldsFunc(strippedStr, func(r rune) bool {
+		return r == ' ' || r == '\n'
+	})
 
 	for i := 0; i < len(separatedStr); i++ {
 		separatedStr[i] = strings.TrimSpace(separatedStr[i])
@@ -52,7 +54,9 @@ func getNginxVhosts(session *ssh.Session) []string {
 		separatedStr[i] = strings.Trim(separatedStr[i], ";")
 	}
 
-	cleanedStr := strings.Join(separatedStr, "\n")
+	uniqStr := removeDuplicates(separatedStr)
+
+	cleanedStr := strings.Join(uniqStr, "\n")
 	return strings.FieldsFunc(cleanedStr, func(r rune) bool {
 		return r == ' ' || r == '\n'
 	})
@@ -64,4 +68,16 @@ func getHttpdVhosts(session *ssh.Session) []string {
 	session.Stdout = &stdoutBuf
 	session.Run("sudo httpd -S")
 	return strings.Split(stdoutBuf.String(), "\n")
+}
+
+func removeDuplicates(str []string) []string {
+	dict := make(map[string]int)
+	for i := range str {
+		dict[str[i]]++
+	}
+	result := make([]string, len(dict))
+	for k := range dict {
+		result = append(result, k)
+	}
+	return result
 }
