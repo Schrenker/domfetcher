@@ -43,11 +43,13 @@ func getNginxVhosts(session *ssh.Session) []string {
 	separatedStr := strings.Split(strippedStr, "\n")
 
 	for i := 0; i < len(separatedStr); i++ {
+		separatedStr[i] = strings.TrimSpace(separatedStr[i])
 		if len(separatedStr[i]) > 0 {
 			if separatedStr[i][0] == '#' || separatedStr[i][0] == '_' {
 				separatedStr = append(separatedStr[:i], separatedStr[i+1:]...)
 			}
 		}
+		separatedStr[i] = strings.Trim(separatedStr[i], ";")
 	}
 
 	cleanedStr := strings.Join(separatedStr, "\n")
