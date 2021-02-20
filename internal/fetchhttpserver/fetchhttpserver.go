@@ -1,3 +1,5 @@
+//Package fetchhttpserver is used to determine which http server is in front of entire server
+//and thus is most likely to contain SSL certificates for given website
 package fetchhttpserver
 
 import (
@@ -34,6 +36,7 @@ func checkHTTPServer(host string) ([]string, error) {
 	return res.Header["Server"], nil
 }
 
+//FetchHTTPServer ...
 func FetchHTTPServer(host string) (string, error) {
 	httpHeader, err := checkHTTPServer(host)
 	if err != nil {

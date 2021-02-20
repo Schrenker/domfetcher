@@ -1,3 +1,5 @@
+//Package fetchvhosts logs in to server via SSH, retrieves current HTTP server configuration containing vhosts
+//Retrieved configration is then processed and parsed into string slice
 package fetchvhosts
 
 import (
@@ -13,6 +15,7 @@ var serverMap = map[string]func(*ssh.Session) []string{
 	"apache": getHttpdVhosts,
 }
 
+//FetchVhosts ...
 func FetchVhosts(host, httpServer string, config *ssh.ClientConfig) []string {
 	client, err := ssh.Dial("tcp", host, config)
 	if err != nil {
@@ -60,7 +63,6 @@ func getNginxVhosts(session *ssh.Session) []string {
 	return strings.FieldsFunc(cleanedStr, func(r rune) bool {
 		return r == ' ' || r == '\n'
 	})
-	// return strings.Split(stdoutBuf.String(), "\n")
 }
 
 func getHttpdVhosts(session *ssh.Session) []string {

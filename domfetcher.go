@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"strings"
@@ -66,7 +65,14 @@ func fetchFromFile(user, keyPath, inputPath string) map[string][]string {
 		}
 		hostMap[hosts[i]] = vhosts
 	}
-	fmt.Println(hostMap)
+
+	// for k, v := range hostMap {
+	// 	fmt.Println(k)
+	// 	for j := range v {
+	// 		fmt.Println(v[j])
+	// 	}
+	// }
+
 	return hostMap
 }
 
