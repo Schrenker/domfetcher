@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"io/ioutil"
 	"log"
@@ -61,7 +62,7 @@ func fetchFromFile(user, keyPath, inputPath string) map[string][]string {
 	for i := range hosts {
 		vhosts, err := getVhosts(hosts[i], config)
 		if err != nil {
-			log.Fatalf("Couldn't fetch vhosts for %v. Err: %v", hosts[i], err)
+			log.Fatalf("Couldn't fetch vhosts for %v. Err: %v\n", hosts[i], err)
 		}
 		hostMap[hosts[i]] = vhosts
 	}
@@ -86,5 +87,12 @@ func main() {
 	if *user == "" || *hostsFile == "" || *identity == "" {
 		log.Fatalln("User, hosts file and identity file required for this to work")
 	}
-	fetchFromFile(*user, *identity, *hostsFile)
+	hostMap := fetchFromFile(*user, *identity, *hostsFile)
+	// jsonString, err := json.Marshal(hostMap)
+	jsonString, err := json.MarshalIndent(hostMap, "", "")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	_ = ioutil.WriteFile("output.json", jsonString, 0644)
 }
