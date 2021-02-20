@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -11,16 +12,12 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func getVhosts(host string, config *ssh.ClientConfig) {
+func getVhosts(host string, config *ssh.ClientConfig) ([]string, error) {
 	HTTPServer, err := fetchhttpserver.FetchHTTPServer(host)
 	if err != nil {
-		return
+		return nil, err
 	}
-	vhosts := fetchvhosts.FetchVhosts(host, HTTPServer, config)
-	for i := range vhosts {
-		fmt.Println(vhosts[i])
-	}
-	//add vhost fetching here
+	return fetchvhosts.FetchVhosts(host, HTTPServer, config), nil
 }
 
 func parseSSHAuth(user, keyPath string) *ssh.ClientConfig {
@@ -58,14 +55,30 @@ func loadInputFile(inputPath string) []string {
 	return result
 }
 
-func fetchFromFile(user, keyPath, inputPath string) {
+func fetchFromFile(user, keyPath, inputPath string) map[string][]string {
 	hosts := loadInputFile(inputPath)
 	config := parseSSHAuth(user, keyPath)
+	hostMap := make(map[string][]string)
 	for i := range hosts {
-		getVhosts(hosts[i], config)
+		vhosts, err := getVhosts(hosts[i], config)
+		if err != nil {
+			log.Fatalf("Couldn't fetch vhosts for %v. Err: %v", hosts[i], err)
+		}
+		hostMap[hosts[i]] = vhosts
 	}
+	fmt.Println(hostMap)
+	return hostMap
 }
 
 func main() {
-	fetchFromFile("kylos", "private/kbkey", "private/input.txt")
+	user := flag.String("u", "", "SSH login user")
+	identity := flag.String("i", "", "passwordless identity file")
+	hostsFile := flag.String("f", "", "hosts file")
+
+	flag.Parse()
+
+	if *user == "" || *hostsFile == "" || *identity == "" {
+		log.Fatalln("User, hosts file and identity file required for this to work")
+	}
+	fetchFromFile(*user, *identity, *hostsFile)
 }
